@@ -8,7 +8,7 @@ pub fn generate_deserialization_impl(
     deserialization_target_field_identifiers: Vec<Ident>,
 ) -> TokenStream {
     quote! {
-        impl<'de> Deserialize<'de> for #deserialization_target_type_identifier {
+        impl<'de> serde::Deserialize<'de> for #deserialization_target_type_identifier {
             fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
             where
                 D: serde::Deserializer<'de>,
@@ -40,6 +40,8 @@ pub fn generate_deserialization_impl(
                         }
                     }
                 }
+
+                #( let #deserialization_target_field_identifiers = #deserialization_target_field_identifiers.ok_or_else(|| serde::de::Error::missing_field("id or key"))?; )*
 
                 Ok(#deserialization_target_type_identifier { #(#deserialization_target_field_identifiers),* })
             }
