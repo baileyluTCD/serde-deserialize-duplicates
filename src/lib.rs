@@ -29,7 +29,7 @@
 //!#[derive(Serialize, Deserialize)]
 //!struct MyStruct {
 //!    #[serde(rename = "myNumber")]
-//!     my_number: Option<i32>
+//!     my_number: i32
 //!}
 //! ```
 //!
@@ -42,7 +42,7 @@
 //!#[derive(Serialize, DeserializeFirstDuplicate)]
 //!struct MyStruct {
 //!    #[serde(rename = "myNumber")]
-//!     my_number: Option<i32>
+//!     my_number: i32
 //!}
 //! ```
 //!
@@ -72,7 +72,7 @@
 //!#[derive(Serialize, DeserializeLastDuplicate)]
 //!struct Dog {
 //!    #[serde(alias = "type")]
-//!     breed: Option<String>
+//!     breed: String
 //!}
 //! ```
 
