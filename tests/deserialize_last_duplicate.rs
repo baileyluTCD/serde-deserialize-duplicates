@@ -1,9 +1,9 @@
 use serde::Serialize;
-use serde_deserialize_duplicates::DeserializeFirstDuplicate;
+use serde_deserialize_duplicates::DeserializeLastDuplicate;
 
 #[test]
 fn test_one_value() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         pub value: String,
     }
@@ -16,12 +16,12 @@ fn test_one_value() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.value, "first".to_owned());
+    assert_eq!(parsed_struct.value, "second".to_owned());
 }
 
 #[test]
 fn test_multiple_values() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         pub a: String,
         pub b: String,
@@ -44,7 +44,7 @@ fn test_multiple_values() {
 
 #[test]
 fn test_renamed_value() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(rename = "other_name")]
         pub original_name: String,
@@ -58,12 +58,12 @@ fn test_renamed_value() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "first".to_owned());
+    assert_eq!(parsed_struct.original_name, "second".to_owned());
 }
 
 #[test]
 fn test_renamed_value_renamed_first() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(rename = "other_name")]
         pub original_name: String,
@@ -77,12 +77,12 @@ fn test_renamed_value_renamed_first() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "first".to_owned());
+    assert_eq!(parsed_struct.original_name, "second".to_owned());
 }
 
 #[test]
 fn test_renamed_value_only_renamed() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(rename = "other_name")]
         pub original_name: String,
@@ -100,7 +100,7 @@ fn test_renamed_value_only_renamed() {
 
 #[test]
 fn test_aliased_value() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(alias = "other_name")]
         pub original_name: String,
@@ -114,12 +114,12 @@ fn test_aliased_value() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "first".to_owned());
+    assert_eq!(parsed_struct.original_name, "second".to_owned());
 }
 
 #[test]
 fn test_aliased_value_aliased_first() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(alias = "other_name")]
         pub original_name: String,
@@ -133,12 +133,12 @@ fn test_aliased_value_aliased_first() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "first".to_owned());
+    assert_eq!(parsed_struct.original_name, "second".to_owned());
 }
 
 #[test]
 fn test_aliased_value_only_aliased() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(alias = "other_name")]
         pub original_name: String,
@@ -156,7 +156,7 @@ fn test_aliased_value_only_aliased() {
 
 #[test]
 fn test_multiple_aliases() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         #[serde(alias = "b", alias = "c")]
         pub a: String,
@@ -171,12 +171,12 @@ fn test_multiple_aliases() {
 
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.a, "first".to_owned());
+    assert_eq!(parsed_struct.a, "third".to_owned());
 }
 
 #[test]
 fn test_optional_value() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         pub value: Option<String>,
     }
@@ -193,7 +193,7 @@ fn test_optional_value() {
 
 #[test]
 fn test_collection_value() {
-    #[derive(Serialize, DeserializeFirstDuplicate)]
+    #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         pub value: Vec<String>,
     }
