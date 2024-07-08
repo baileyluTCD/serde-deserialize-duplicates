@@ -1,18 +1,17 @@
-use proc_macro2::Ident;
-use syn::{Data, LitStr};
+use syn::Data;
 
-use crate::aliased_field::{AliasedField, AliasedFields};
+use crate::aliased_field::{AliasedField, AliasedFieldError, AliasedFields};
 
-pub fn parse_field_names(input: Data) -> AliasedFields {
+/// Parse
+pub fn parse_field_names(input: Data) -> Result<AliasedFields, AliasedFieldError> {
     let Data::Struct(struct_data) = input else {
         panic!("This macro can only be used on structs")
     };
 
-    struct_data
+    Ok(struct_data
         .fields
         .into_iter()
         .map(AliasedField::try_from)
-        .map(Result::unwrap)
-        .collect::<Vec<_>>()
-        .into()
+        .collect::<Result<Vec<_>, AliasedFieldError>>()?
+        .into())
 }

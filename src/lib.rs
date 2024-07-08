@@ -79,7 +79,7 @@
 #![warn(missing_docs)]
 
 use aliased_field::AliasedFields;
-use quote::quote;
+use quote::{quote, quote_spanned};
 use syn::{parse_macro_input, DeriveInput};
 
 mod aliased_field;
@@ -121,20 +121,28 @@ use parse_field_names::parse_field_names;
 pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    let AliasedFields {
-        field_identifiers,
-        names,
-        use_defaults,
-    } = parse_field_names(input.data);
+    match parse_field_names(input.data) {
+        Ok(AliasedFields {
+            field_identifiers,
+            names,
+            use_defaults,
+        }) => generate_deserialization_impl(
+            quote! {
+                #(#( #names )|* if #field_identifiers.is_none() => #field_identifiers = Some(map.next_value()?)),*
+            },
+            input.ident,
+            field_identifiers,
+            use_defaults,
+        ),
+        Err(e) => {
+            let emitted_error = e.to_string();
 
-    generate_deserialization_impl(
-        quote! {
-            #(#( #names )|* if #field_identifiers.is_none() => #field_identifiers = Some(map.next_value()?)),*
-        },
-        input.ident,
-        field_identifiers,
-        use_defaults
-    )
+            quote_spanned! {
+                input.ident.span() =>
+                compile_error!(#emitted_error);
+            }.into()
+        }
+    }
 }
 
 /// # Deserialize Last Duplicate macro
@@ -169,18 +177,26 @@ pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro
 pub fn deserialize_last_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    let AliasedFields {
-        field_identifiers,
-        names,
-        use_defaults
-    } = parse_field_names(input.data);
+    match parse_field_names(input.data) {
+        Ok(AliasedFields {
+            field_identifiers,
+            names,
+            use_defaults,
+        }) => generate_deserialization_impl(
+            quote! {
+                #(#( #names )|* => #field_identifiers = Some(map.next_value()?)),*
+            },
+            input.ident,
+            field_identifiers,
+            use_defaults,
+        ),
+        Err(e) => {
+            let emitted_error = e.to_string();
 
-    generate_deserialization_impl(
-        quote! {
-            #(#( #names )|* => #field_identifiers = Some(map.next_value()?)),*
-        },
-        input.ident,
-        field_identifiers,
-        use_defaults
-    )
+            quote_spanned! {
+                input.ident.span() =>
+                compile_error!(#emitted_error);
+            }.into()
+        }
+    }
 }

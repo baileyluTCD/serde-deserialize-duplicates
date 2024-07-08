@@ -14,9 +14,9 @@ fn test_one_value() {
             "value": "second"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.value, "second".to_owned());
+    assert_eq!(test_struct.value, "second".to_owned());
 }
 
 #[test]
@@ -35,11 +35,11 @@ fn test_multiple_values() {
             "c": "third"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.a, "first".to_owned());
-    assert_eq!(parsed_struct.b, "second".to_owned());
-    assert_eq!(parsed_struct.c, "third".to_owned());
+    assert_eq!(test_struct.a, "first".to_owned());
+    assert_eq!(test_struct.b, "second".to_owned());
+    assert_eq!(test_struct.c, "third".to_owned());
 }
 
 #[test]
@@ -56,9 +56,9 @@ fn test_renamed_value() {
             "other_name": "second"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "second".to_owned());
+    assert_eq!(test_struct.original_name, "second".to_owned());
 }
 
 #[test]
@@ -75,9 +75,9 @@ fn test_renamed_value_renamed_first() {
             "original_name": "second"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "second".to_owned());
+    assert_eq!(test_struct.original_name, "second".to_owned());
 }
 
 #[test]
@@ -93,9 +93,9 @@ fn test_renamed_value_only_renamed() {
             "other_name": "exists"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "exists".to_owned());
+    assert_eq!(test_struct.original_name, "exists".to_owned());
 }
 
 #[test]
@@ -112,9 +112,9 @@ fn test_aliased_value() {
             "other_name": "second"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "second".to_owned());
+    assert_eq!(test_struct.original_name, "second".to_owned());
 }
 
 #[test]
@@ -131,9 +131,9 @@ fn test_aliased_value_aliased_first() {
             "original_name": "second"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "second".to_owned());
+    assert_eq!(test_struct.original_name, "second".to_owned());
 }
 
 #[test]
@@ -149,9 +149,9 @@ fn test_aliased_value_only_aliased() {
             "other_name": "exists"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.original_name, "exists".to_owned());
+    assert_eq!(test_struct.original_name, "exists".to_owned());
 }
 
 #[test]
@@ -169,9 +169,9 @@ fn test_multiple_aliases() {
             "c": "third"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.a, "third".to_owned());
+    assert_eq!(test_struct.a, "third".to_owned());
 }
 
 #[test]
@@ -186,9 +186,9 @@ fn test_optional_value_some() {
             "value": "exists"
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.value, Some("exists".to_owned()));
+    assert_eq!(test_struct.value, Some("exists".to_owned()));
 }
 
 #[test]
@@ -203,9 +203,9 @@ fn test_optional_value_none_default() {
         {
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.value, None);
+    assert_eq!(test_struct.value, None);
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn test_collection_value() {
             "value": ["a", "b"]
         }"#;
 
-    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+    let test_struct: TestStruct = serde_json::from_str(data).unwrap();
 
-    assert_eq!(parsed_struct.value, vec!["a".to_owned(), "b".to_owned()]);
+    assert_eq!(test_struct.value, vec!["a".to_owned(), "b".to_owned()]);
 }
