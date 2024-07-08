@@ -1,6 +1,8 @@
 mod aliased_field_error;
+mod aliased_fields;
 
 pub use aliased_field_error::AliasedFieldError;
+pub use aliased_fields::AliasedFields;
 
 use proc_macro2::{Ident, Span};
 use syn::{Field, LitStr};
@@ -18,6 +20,9 @@ pub struct AliasedField {
 
     /// A list of alias names
     pub names: Vec<LitStr>,
+
+    /// A list of defaultable names
+    pub use_default: bool,
 }
 
 impl TryFrom<Field> for AliasedField {
@@ -30,6 +35,8 @@ impl TryFrom<Field> for AliasedField {
             &field_identifier.to_string(),
             Span::call_site(),
         )];
+
+        let mut use_default = Default::default();
 
         value
             .attrs
@@ -45,6 +52,13 @@ impl TryFrom<Field> for AliasedField {
 
                         return Ok(());
                     }
+
+                    if meta.path.is_ident("default") {
+                        use_default = true;
+
+                        return Ok(())
+                    }
+
                     Err(meta.error("Unsupported serde attribute"))
                 })
             })?;
@@ -52,12 +66,7 @@ impl TryFrom<Field> for AliasedField {
         Ok(Self {
             field_identifier,
             names,
+            use_default
         })
-    }
-}
-
-impl From<AliasedField> for (Ident, Vec<LitStr>) {
-    fn from(val: AliasedField) -> Self {
-        (val.field_identifier, val.names)
     }
 }

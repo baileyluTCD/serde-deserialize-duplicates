@@ -175,7 +175,7 @@ fn test_multiple_aliases() {
 }
 
 #[test]
-fn test_optional_value() {
+fn test_optional_value_some() {
     #[derive(Serialize, DeserializeLastDuplicate)]
     struct TestStruct {
         pub value: Option<String>,
@@ -189,6 +189,23 @@ fn test_optional_value() {
     let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
 
     assert_eq!(parsed_struct.value, Some("exists".to_owned()));
+}
+
+#[test]
+fn test_optional_value_none_default() {
+    #[derive(Serialize, DeserializeLastDuplicate)]
+    struct TestStruct {
+        #[serde(default)]
+        pub value: Option<String>,
+    }
+
+    let data = r#"
+        {
+        }"#;
+
+    let parsed_struct: TestStruct = serde_json::from_str(data).unwrap();
+
+    assert_eq!(parsed_struct.value, None);
 }
 
 #[test]

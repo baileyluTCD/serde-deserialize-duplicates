@@ -25,7 +25,7 @@
 //!
 //! ```rust
 //!use serde::{Serialize, Deserialize};
-//! 
+//!
 //!#[derive(Serialize, Deserialize)]
 //!struct MyStruct {
 //!    #[serde(rename = "myNumber")]
@@ -38,7 +38,7 @@
 //! ```rust
 //!use serde::Serialize;
 //!use serde_deserialize_duplicates::DeserializeFirstDuplicate;
-//! 
+//!
 //!#[derive(Serialize, DeserializeFirstDuplicate)]
 //!struct MyStruct {
 //!    #[serde(rename = "myNumber")]
@@ -68,7 +68,7 @@
 //! ```rust
 //!use serde::Serialize;
 //!use serde_deserialize_duplicates::DeserializeLastDuplicate;
-//! 
+//!
 //!#[derive(Serialize, DeserializeLastDuplicate)]
 //!struct Dog {
 //!    #[serde(alias = "type")]
@@ -78,6 +78,7 @@
 
 #![warn(missing_docs)]
 
+use aliased_field::AliasedFields;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
 
@@ -120,14 +121,19 @@ use parse_field_names::parse_field_names;
 pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    let (field_names, alias_names) = parse_field_names(input.data);
+    let AliasedFields {
+        field_identifiers,
+        names,
+        use_defaults,
+    } = parse_field_names(input.data);
 
     generate_deserialization_impl(
         quote! {
-            #(#( #alias_names )|* if #field_names.is_none() => #field_names = Some(map.next_value()?)),*
+            #(#( #names )|* if #field_identifiers.is_none() => #field_identifiers = Some(map.next_value()?)),*
         },
         input.ident,
-        field_names,
+        field_identifiers,
+        use_defaults
     )
 }
 
@@ -163,13 +169,18 @@ pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro
 pub fn deserialize_last_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    let (field_names, alias_names) = parse_field_names(input.data);
+    let AliasedFields {
+        field_identifiers,
+        names,
+        use_defaults
+    } = parse_field_names(input.data);
 
     generate_deserialization_impl(
         quote! {
-            #(#( #alias_names )|* => #field_names = Some(map.next_value()?)),*
+            #(#( #names )|* => #field_identifiers = Some(map.next_value()?)),*
         },
         input.ident,
-        field_names,
+        field_identifiers,
+        use_defaults
     )
 }

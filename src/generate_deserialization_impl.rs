@@ -1,12 +1,24 @@
-use proc_macro::TokenStream;
-use proc_macro2::Ident;
+use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 
 pub fn generate_deserialization_impl(
     key_value_mapping_patterns: proc_macro2::TokenStream,
     deserialization_target_type_identifier: Ident,
     deserialization_target_field_identifiers: Vec<Ident>,
-) -> TokenStream {
+    use_defaults: Vec<bool>
+) -> proc_macro::TokenStream {
+
+    
+    let value_extractors = deserialization_target_field_identifiers.iter().zip(use_defaults).map(|(identifier, use_default)|
+        if use_default {
+            quote! {unwrap_or_default()}
+        } else {
+            let identifier_display_representation = identifier.to_string();
+
+            quote! {ok_or_else(|| serde::de::Error::missing_field(#identifier_display_representation))?}
+        }
+    ).collect::<Vec<TokenStream>>();
+
     quote! {
         impl<'de> serde::Deserialize<'de> for #deserialization_target_type_identifier {
             fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -32,16 +44,16 @@ pub fn generate_deserialization_impl(
             {
                 #( let mut #deserialization_target_field_identifiers = None; )*
 
-                while let Some(key) = map.next_key::<String>()? {
-                    match key.as_str() {
-                        #key_value_mapping_patterns ,
+                while let Some(key) = map.next_key::<&str>()? {
+                    match key {
+                        #key_value_mapping_patterns,
                         _ => {
                             let _ = map.next_value::<serde_json::Value>()?;
                         }
                     }
                 }
-
-                #( let #deserialization_target_field_identifiers = #deserialization_target_field_identifiers.ok_or_else(|| serde::de::Error::missing_field("id or key"))?; )*
+                
+                #( let #deserialization_target_field_identifiers = #deserialization_target_field_identifiers.#value_extractors;)*
 
                 Ok(#deserialization_target_type_identifier { #(#deserialization_target_field_identifiers),* })
             }
