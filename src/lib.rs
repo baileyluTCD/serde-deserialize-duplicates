@@ -62,7 +62,7 @@
 //!}
 //! ```
 //!
-//! Sometimes we have two fields which may or may not exist in JSON that provide identical information and we only want to deserialize one of them in the case we get one.
+//! Sometimes we have two fields which exist in JSON that provide identical information and we only want to deserialize one of them in the case we get one.
 //!
 //! This can be achieved as follows:
 //! ```rust
@@ -73,6 +73,23 @@
 //!struct Dog {
 //!    #[serde(alias = "type")]
 //!     breed: String
+//!}
+//! ```
+//! 
+//! ### Default fallback values
+//! 
+//! Occasionally, we may want to load some data which can or cannot exist, and may or may not be a duplicate at the same time.
+//! 
+//! Serde's `default` attribute is supported for this purpose, either deserializing successfully or using a fallback default value.
+//! 
+//! ```rust
+//!use serde::Serialize;
+//!use serde_deserialize_duplicates::DeserializeLastDuplicate;
+//!
+//!#[derive(Serialize, DeserializeLastDuplicate)]
+//!struct Dog {
+//!    #[serde(default)]
+//!     occurs_more_than_once: Option<String>
 //!}
 //! ```
 
@@ -87,7 +104,7 @@ mod generate_deserialization_impl;
 mod parse_field_names;
 
 use generate_deserialization_impl::generate_deserialization_impl;
-use parse_field_names::parse_field_names;
+use parse_field_names::parse_fields;
 
 /// # Deserialize First Duplicate macro
 ///
@@ -121,7 +138,7 @@ use parse_field_names::parse_field_names;
 pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    match parse_field_names(input.data) {
+    match parse_fields(input.data) {
         Ok(AliasedFields {
             field_identifiers,
             names,
@@ -177,7 +194,7 @@ pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro
 pub fn deserialize_last_duplicate(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    match parse_field_names(input.data) {
+    match parse_fields(input.data) {
         Ok(AliasedFields {
             field_identifiers,
             names,
