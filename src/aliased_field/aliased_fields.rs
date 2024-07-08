@@ -8,34 +8,33 @@ pub struct AliasedFields {
     pub field_identifiers: Vec<Ident>,
 
     /// A list of alias names
-    pub names: Vec<Vec<LitStr>>,
+    pub names_list: Vec<Vec<LitStr>>,
 
     /// A list of defaultable names
-    pub use_defaults: Vec<bool>,
+    pub uses_default_selections: Vec<bool>,
 }
 
 impl From<Vec<AliasedField>> for AliasedFields {
     fn from(fields: Vec<AliasedField>) -> Self {
-        let mut field_identifiers_list = Vec::new();
+        let mut field_identifiers = Vec::new();
         let mut names_list = Vec::new();
-        let mut use_defaults = Vec::new();
+        let mut uses_default_selections = Vec::new();
 
-        for field in fields {
-            let AliasedField {
-                field_identifier,
-                names,
-                use_default,
-            } = field;
-
-            field_identifiers_list.push(field_identifier);
+        for AliasedField {
+            field_identifier,
+            names,
+            uses_default
+        } in fields
+        {
+            field_identifiers.push(field_identifier);
             names_list.push(names);
-            use_defaults.push(use_default);
+            uses_default_selections.push(uses_default);
         }
 
         Self {
-            field_identifiers: field_identifiers_list,
-            names: names_list,
-            use_defaults,
+            field_identifiers,
+            names_list,
+            uses_default_selections,
         }
     }
 }

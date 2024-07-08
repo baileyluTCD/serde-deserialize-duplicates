@@ -101,10 +101,10 @@ use syn::{parse_macro_input, DeriveInput};
 
 mod aliased_field;
 mod generate_deserialization_impl;
-mod parse_field_names;
+mod parse_fields;
 
 use generate_deserialization_impl::generate_deserialization_impl;
-use parse_field_names::parse_fields;
+use parse_fields::parse_fields;
 
 /// # Deserialize First Duplicate macro
 ///
@@ -141,15 +141,15 @@ pub fn deserialize_first_duplicate(input: proc_macro::TokenStream) -> proc_macro
     match parse_fields(input.data) {
         Ok(AliasedFields {
             field_identifiers,
-            names,
-            use_defaults,
+            names_list,
+            uses_default_selections,
         }) => generate_deserialization_impl(
             quote! {
-                #(#( #names )|* if #field_identifiers.is_none() => #field_identifiers = Some(map.next_value()?)),*
+                #(#( #names_list )|* if #field_identifiers.is_none() => #field_identifiers = Some(map.next_value()?)),*
             },
             input.ident,
             field_identifiers,
-            use_defaults,
+            uses_default_selections,
         ),
         Err(e) => {
             let emitted_error = e.to_string();
@@ -197,15 +197,15 @@ pub fn deserialize_last_duplicate(input: proc_macro::TokenStream) -> proc_macro:
     match parse_fields(input.data) {
         Ok(AliasedFields {
             field_identifiers,
-            names,
-            use_defaults,
+            names_list,
+            uses_default_selections,
         }) => generate_deserialization_impl(
             quote! {
-                #(#( #names )|* => #field_identifiers = Some(map.next_value()?)),*
+                #(#( #names_list )|* => #field_identifiers = Some(map.next_value()?)),*
             },
             input.ident,
             field_identifiers,
-            use_defaults,
+            uses_default_selections,
         ),
         Err(e) => {
             let emitted_error = e.to_string();

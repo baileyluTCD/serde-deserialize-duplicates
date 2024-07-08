@@ -21,8 +21,8 @@ pub struct AliasedField {
     /// A list of alias names
     pub names: Vec<LitStr>,
 
-    /// A list of defaultable names
-    pub use_default: bool,
+    /// Should this value be deserialized and use the default value on error
+    pub uses_default: bool,
 }
 
 impl TryFrom<Field> for AliasedField {
@@ -36,7 +36,7 @@ impl TryFrom<Field> for AliasedField {
             Span::call_site(),
         )];
 
-        let mut use_default = Default::default();
+        let mut uses_default = Default::default();
 
         value
             .attrs
@@ -54,7 +54,7 @@ impl TryFrom<Field> for AliasedField {
                     }
 
                     if meta.path.is_ident("default") {
-                        use_default = true;
+                        uses_default = true;
 
                         return Ok(())
                     }
@@ -66,7 +66,7 @@ impl TryFrom<Field> for AliasedField {
         Ok(Self {
             field_identifier,
             names,
-            use_default
+            uses_default
         })
     }
 }

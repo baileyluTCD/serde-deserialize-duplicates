@@ -5,11 +5,11 @@ pub fn generate_deserialization_impl(
     key_value_mapping_patterns: proc_macro2::TokenStream,
     deserialization_target_type_identifier: Ident,
     deserialization_target_field_identifiers: Vec<Ident>,
-    use_defaults: Vec<bool>
+    uses_default_selections: Vec<bool>
 ) -> proc_macro::TokenStream {
 
     
-    let value_extractors = deserialization_target_field_identifiers.iter().zip(use_defaults).map(|(identifier, use_default)|
+    let value_extractors = deserialization_target_field_identifiers.iter().zip(uses_default_selections).map(|(identifier, use_default)|
         if use_default {
             quote! {unwrap_or_default()}
         } else {
